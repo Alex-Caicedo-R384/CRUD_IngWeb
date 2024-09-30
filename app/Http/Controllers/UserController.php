@@ -59,24 +59,40 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(User $user)
     {
-        //
+        return view('users.edit', compact('user'));
     }
+    
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $user)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:6',
+        ]);
+    
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password ? bcrypt($request->password) : $user->password,
+        ]);
+    
+        return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
     }
+    
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return redirect()->route('users.index')->with('success', 'Usuario eliminado correctamente.');
     }
+    
 }
