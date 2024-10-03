@@ -9,33 +9,30 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+function index()
     {
         $users = User::all();
         return view('users.index', compact('users'));
     }    
     
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('users.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|email|unique:users',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El formato del correo electrónico es inválido. Debe contener un "@" y ser un correo válido.',
+            'email.unique' => 'El correo electrónico ya está registrado.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
         ]);
     
         User::create([
@@ -47,33 +44,31 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
     }
     
-
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id)
     {
-        //
+        
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+  
     public function edit(User $user)
     {
         return view('users.edit', compact('user'));
     }
     
-
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, User $user)
     {
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6',
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El formato del correo electrónico es inválido. Debe contener un "@" y ser un correo válido.',
+            'email.unique' => 'El correo electrónico ya está registrado.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres si se proporciona.',
         ]);
     
         $user->update([
@@ -85,10 +80,8 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
     }
     
+    
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(User $user)
     {
         $user->delete();
